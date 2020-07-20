@@ -7,7 +7,10 @@ use crate::token::tokenizer::Tokenizer;
 fn test_token_regex() {
     let is_whitespace = TokenTypes::WHITESPACE.tokens().regex().is_match(" ");
     let is_number = TokenTypes::NUMBER.tokens().regex().is_match("1");
-    let is_string = TokenTypes::IDENTIFIER.tokens().regex().is_match("someString");
+    let is_string = TokenTypes::IDENTIFIER
+        .tokens()
+        .regex()
+        .is_match("someString");
     let is_lparen = TokenTypes::LPAREN.tokens().regex().is_match("(");
     let is_paren = TokenTypes::RPAREN.tokens().regex().is_match(")");
     let is_print = TokenTypes::PRINT.tokens().regex().is_match("#");
@@ -21,7 +24,7 @@ fn test_token_regex() {
 
 #[test]
 fn test_tokenizer_number() {
-    let tokenizer = Tokenizer {};
+    let tokenizer = Tokenizer { debug: false };
     let tokens: Vec<Token> = tokenizer.tokenize("**$ number1 27\n**$ number2 42");
     assert_eq!(tokens.len(), 6);
     let number_token_1 = tokens.get(0).unwrap();
@@ -40,7 +43,7 @@ fn test_tokenizer_number() {
 
 #[test]
 fn test_tokenizer_string() {
-    let tokenizer = Tokenizer {};
+    let tokenizer = Tokenizer { debug: false };
     let tokens: Vec<Token> = tokenizer.tokenize("**\" string1 \"hi\"\n**\" string2 \"world\"");
     assert_eq!(tokens.len(), 6);
     let string_token_1 = tokens.get(0).unwrap();
@@ -59,7 +62,7 @@ fn test_tokenizer_string() {
 
 #[test]
 fn test_tokenizer_boolean() {
-    let tokenizer = Tokenizer {};
+    let tokenizer = Tokenizer { debug: false };
     let tokens: Vec<Token> = tokenizer.tokenize("**b boolean1 true\n**b boolean2 false");
     assert_eq!(tokens.len(), 6);
     let boolean_token_1 = tokens.get(0).unwrap();
@@ -78,7 +81,7 @@ fn test_tokenizer_boolean() {
 
 #[test]
 fn test_tokenizer_print() {
-    let tokenizer = Tokenizer {};
+    let tokenizer = Tokenizer { debug: false };
     let tokens: Vec<Token> = tokenizer.tokenize("# \"hello\"\n**b boolean1 false\n# boolean1");
     assert_eq!(tokens.len(), 7);
     let print_token_1 = tokens.get(0).unwrap();

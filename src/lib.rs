@@ -2,5 +2,5 @@
 extern crate lazy_static;
 
 pub mod parser;
-pub mod token;
 pub mod test;
+pub mod token;

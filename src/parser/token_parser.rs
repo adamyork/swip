@@ -1,7 +1,9 @@
 use crate::token::token_type::TokenTypes;
 use crate::token::tokenizer::Token;
 
-pub struct TokenParser {}
+pub struct TokenParser {
+    pub debug: bool
+}
 
 impl TokenParser {
     pub fn parse(&self, tokens: &mut Vec<Token>) -> Vec<Vec<Token>> {

@@ -4,8 +4,8 @@ use crate::token::tokenizer::Tokenizer;
 
 #[test]
 fn test_no_branch_tree() {
-    let tokenizer = Tokenizer {};
-    let parser = TokenParser {};
+    let tokenizer = Tokenizer { debug: false };
+    let parser = TokenParser { debug: false };
     let mut tokens: Vec<Token> = tokenizer.tokenize("**$ number1 27\n**$ number2 42");
     let mut tree: Vec<Vec<Token>> = parser.parse(&mut tokens);
     assert_eq!(tree.len(), 6);

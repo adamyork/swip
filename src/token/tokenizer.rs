@@ -3,7 +3,9 @@ use strum::IntoEnumIterator;
 use crate::token::data_types::DataTypes;
 use crate::token::token_type::TokenTypes;
 
-pub struct Tokenizer {}
+pub struct Tokenizer {
+    pub debug: bool
+}
 
 impl Tokenizer {
     pub fn tokenize(&self, input: &str) -> Vec<Token> {
@@ -36,7 +38,9 @@ impl Tokenizer {
                         value: next.clone(),
                     };
                     tokens.push(next_token);
-                    println!("token created {:?}", next);
+                    if self.debug {
+                        println!("token created {:?}", next);
+                    }
                 }
             }
         }

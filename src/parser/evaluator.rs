@@ -3,12 +3,14 @@ use std::collections::HashMap;
 
 use reduce::Reduce;
 
+use crate::parser::evaluator::Reference::Boolean;
 use crate::token::data_types::DataTypes;
 use crate::token::token_type::TokenTypes;
 use crate::token::tokenizer::Token;
 
 pub struct Evaluator {
     pub global_scope: HashMap<String, Reference>,
+    pub debug: bool,
 }
 
 #[derive(Debug)]
@@ -86,7 +88,6 @@ impl Evaluator {
             let left_reference = left_token_maybe_reference.unwrap();
             if let Reference::String(_string_value, string_mutable) = left_reference {
                 if string_mutable.eq(&true) {
-                    println!("here");
                     Self::update_string_reference(token, tree, scope);
                     return;
                 } else {
@@ -218,12 +219,15 @@ impl Evaluator {
         let next_branch = tree.remove(0);
         let identifier_token = next_branch.get(0).unwrap();
         let identifier_token_value = &identifier_token.value;
-        let value_token_branch = tree.remove(0);
-        let value_token = value_token_branch.get(0);
-        println!("create boolean {}", identifier_token_value);
         let val;
-        if value_token.is_some() {
-            val = value_token.unwrap().value.parse().unwrap();
+        if tree.len() > 0 {
+            let value_token_branch = tree.remove(0);
+            let value_token = value_token_branch.get(0);
+            if value_token.is_some() {
+                val = value_token.unwrap().value.parse().unwrap();
+            } else {
+                val = false;
+            }
         } else {
             val = false;
         }
@@ -256,7 +260,7 @@ impl Evaluator {
             return Operator::BOOLEANAND(".");
         };
         if token.value.contains("\\") {
-            return Operator::BOOLEANAND("\\");
+            return Operator::BOOLEANOR("\\");
         };
         Operator::UNSUPPORTED("")
     }
@@ -278,6 +282,12 @@ impl Evaluator {
             return Self::check_names(token, pattern, scope);
         }
         if let Operator::CONCAT(pattern) = operator {
+            return Self::check_names(token, pattern, scope);
+        }
+        if let Operator::BOOLEANAND(pattern) = operator {
+            return Self::check_names(token, pattern, scope);
+        }
+        if let Operator::BOOLEANOR(pattern) = operator {
             return Self::check_names(token, pattern, scope);
         }
         return false;
@@ -338,10 +348,7 @@ impl Evaluator {
             let right_reference = maybe_right_value.unwrap();
             if let Reference::String(right_value, _right_mutable) = right_reference {
                 let right_clone = right_value.clone();
-                scope.insert(
-                    token.value.clone(),
-                    Reference::String(right_clone, true),
-                );
+                scope.insert(token.value.clone(), Reference::String(right_clone, true));
             }
         } else {
             let operator = Self::get_string_operator(right_identifier_token);
@@ -379,26 +386,29 @@ impl Evaluator {
             let right_reference = maybe_right_value.unwrap();
             if let Reference::Boolean(right_value, _right_mutable) = right_reference {
                 let right_clone = right_value.clone();
-                scope.insert(
-                    token.value.clone(),
-                    Reference::Boolean(right_clone, true),
-                );
+                scope.insert(token.value.clone(), Reference::Boolean(right_clone, true));
             }
         } else {
             let operator = Self::get_boolean_operator(right_identifier_token);
             if Self::all_names_in_scope(right_identifier_token, scope, operator) {
                 //left assignment of concatenated value
-                // let new_value = Self::boolean_and(right_identifier_token, scope, &operator);
-                // scope.insert(
-                //     token.value.clone(),
-                //     Reference::String(new_value.clone(), true),
-                // );
+                let mut value = false;
+                if let Operator::BOOLEANAND(pattern) = operator {
+                    let references: Vec<bool> = Referencer::get_all(right_identifier_token, &pattern, scope);
+                    value = references.into_iter().reduce(|a, b| a && b).unwrap();
+                }
+                if let Operator::BOOLEANOR(pattern) = operator {
+                    let references: Vec<bool> = Referencer::get_all(right_identifier_token, &pattern, scope);
+                    value = references.into_iter().reduce(|a, b| a || b).unwrap();
+                }
+                scope.insert(
+                    token.value.clone(),
+                    Reference::Boolean(value.clone(), true),
+                );
             } else {
                 //left assignment of raw value
-                // scope.insert(
-                //     token.value.clone(),
-                //     Reference::String(right_identifier_token.value.replace("\"", ""), true),
-                // );
+                let bool_val = right_identifier_token.value.parse().unwrap();
+                scope.insert(token.value.clone(), Reference::Boolean(bool_val, true));
             }
         }
     }
@@ -448,6 +458,26 @@ impl GetAll<i32> for Referencer {
                     }
                 }
                 return 0;
+            })
+            .collect();
+    }
+}
+
+impl GetAll<bool> for Referencer {
+    //noinspection DuplicatedCode
+    fn get_all(token: &Token, pattern: &&str, scope: &mut HashMap<String, Reference>) -> Vec<bool> {
+        let names: Vec<&str> = token.value.split(pattern).collect();
+        return names
+            .into_iter()
+            .map(|name| {
+                let maybe_ref = scope.get(name.clone());
+                if maybe_ref.is_some() {
+                    let r = maybe_ref.unwrap();
+                    if let Reference::Boolean(val, _mutable) = r {
+                        return val.to_owned();
+                    }
+                }
+                return false;
             })
             .collect();
     }
