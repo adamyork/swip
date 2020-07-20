@@ -25,6 +25,8 @@ pub enum Operator<'a> {
     MULTIPLICATION(&'a str),
     DIVISION(&'a str),
     CONCAT(&'a str),
+    BOOLEANAND(&'a str),
+    BOOLEANOR(&'a str),
     UNSUPPORTED(&'a str),
 }
 
@@ -58,7 +60,16 @@ impl Evaluator {
         let next_token_value = next_token.value.as_str();
         let scope_value = scope.get(next_token_value);
         if scope_value.is_some() {
-            println!("{:?}", scope_value.unwrap());
+            let reference = scope_value.unwrap();
+            if let Reference::String(string_val, string_mutable) = reference {
+                println!("{}:{}", string_val, string_mutable);
+            }
+            if let Reference::Number(number_val, number_mutable) = reference {
+                println!("{}:{}", number_val, number_mutable);
+            }
+            if let Reference::Boolean(bool_val, bool_mutable) = reference {
+                println!("{}:{}", bool_val, bool_mutable);
+            }
         } else {
             println!("{}", next_token_value);
         }
@@ -75,6 +86,7 @@ impl Evaluator {
             let left_reference = left_token_maybe_reference.unwrap();
             if let Reference::String(_string_value, string_mutable) = left_reference {
                 if string_mutable.eq(&true) {
+                    println!("here");
                     Self::update_string_reference(token, tree, scope);
                     return;
                 } else {
@@ -239,6 +251,15 @@ impl Evaluator {
         };
         Operator::UNSUPPORTED("")
     }
+    pub fn get_boolean_operator(token: &Token) -> Operator {
+        if token.value.contains(".") {
+            return Operator::BOOLEANAND(".");
+        };
+        if token.value.contains("\\") {
+            return Operator::BOOLEANAND("\\");
+        };
+        Operator::UNSUPPORTED("")
+    }
     pub fn all_names_in_scope(
         token: &Token,
         scope: &mut HashMap<String, Reference>,
@@ -267,7 +288,7 @@ impl Evaluator {
         scope: &mut HashMap<String, Reference>,
     ) -> bool {
         let names: Vec<&str> = token.value.split(pattern).collect();
-        let count = scope.keys().len() as i32;
+        let count = names.len();
         let mut found = 0;
         for name in names.iter() {
             let reference = scope.get(name.to_owned());
@@ -313,32 +334,73 @@ impl Evaluator {
         let right_identifier_token = right_branch.get(0).unwrap();
         let maybe_right_value = scope.get(right_identifier_token.value.clone().as_str());
         if maybe_right_value.is_some() {
+            //left assignment of right variable previously declared
             let right_reference = maybe_right_value.unwrap();
             if let Reference::String(right_value, _right_mutable) = right_reference {
+                let right_clone = right_value.clone();
                 scope.insert(
                     token.value.clone(),
-                    Reference::String(right_value.clone(), true),
+                    Reference::String(right_clone, true),
                 );
             }
         } else {
-            // if (allNamesInScope(next, scope, '.')) {
-            //     scope[branch.value].value = stringConcat(next, scope);
-            // } else {
-            //     //scope[branch.value].value = next.value.replace(/\"/g, '');;
-            // }
+            let operator = Self::get_string_operator(right_identifier_token);
+            if Self::all_names_in_scope(right_identifier_token, scope, operator) {
+                //left assignment of concatenated value
+                let new_value = Self::string_concat(right_identifier_token, scope, &operator);
+                scope.insert(
+                    token.value.clone(),
+                    Reference::String(new_value.clone(), true),
+                );
+            } else {
+                //left assignment of raw value
+                scope.insert(
+                    token.value.clone(),
+                    Reference::String(right_identifier_token.value.replace("\"", ""), true),
+                );
+            }
         }
     }
     pub fn update_number_reference(
         token: &Token,
         tree: &mut Vec<Vec<Token>>,
         scope: &mut HashMap<String, Reference>,
-    ) {
-    }
+    ) {}
     pub fn update_boolean_reference(
         token: &Token,
         tree: &mut Vec<Vec<Token>>,
         scope: &mut HashMap<String, Reference>,
     ) {
+        let right_branch = tree.remove(0);
+        let right_identifier_token = right_branch.get(0).unwrap();
+        let maybe_right_value = scope.get(right_identifier_token.value.clone().as_str());
+        if maybe_right_value.is_some() {
+            //left assignment of right variable previously declared
+            let right_reference = maybe_right_value.unwrap();
+            if let Reference::Boolean(right_value, _right_mutable) = right_reference {
+                let right_clone = right_value.clone();
+                scope.insert(
+                    token.value.clone(),
+                    Reference::Boolean(right_clone, true),
+                );
+            }
+        } else {
+            let operator = Self::get_boolean_operator(right_identifier_token);
+            if Self::all_names_in_scope(right_identifier_token, scope, operator) {
+                //left assignment of concatenated value
+                // let new_value = Self::boolean_and(right_identifier_token, scope, &operator);
+                // scope.insert(
+                //     token.value.clone(),
+                //     Reference::String(new_value.clone(), true),
+                // );
+            } else {
+                //left assignment of raw value
+                // scope.insert(
+                //     token.value.clone(),
+                //     Reference::String(right_identifier_token.value.replace("\"", ""), true),
+                // );
+            }
+        }
     }
 }
 
@@ -391,24 +453,6 @@ impl GetAll<i32> for Referencer {
     }
 }
 
-// }
-
-// function updateStringReference(instance, branch, tree, scope) {
-//     var next = tree.shift();
-//     if (instance.mutable) {
-//         if (scope[next.value] !== undefined) {
-//             //update from reference
-//             scope[branch.value].value = scope[next.value].value;
-//         } else {
-//             if (allNamesInScope(next, scope, '.')) {
-//                 scope[branch.value].value = stringConcat(next, scope);
-//             } else {
-//                 scope[branch.value].value = next.value.replace(/\"/g, '');;
-//             }
-//         }
-//     } else {
-//         throw new Error('cant re-assign immutable string');
-//     }
 // }
 
 // function updateNumberReference(instance, branch, tree, scope) {
