@@ -4,7 +4,7 @@ use crate::token::data_types::DataTypes;
 use crate::token::token_type::TokenTypes;
 
 pub struct Tokenizer {
-    pub debug: bool
+    pub debug: bool,
 }
 
 impl Tokenizer {

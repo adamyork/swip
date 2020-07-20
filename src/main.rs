@@ -17,12 +17,8 @@ fn main() {
             debug = true;
         }
     }
-    let tokenizer = Tokenizer {
-        debug
-    };
-    let parser = TokenParser {
-        debug
-    };
+    let tokenizer = Tokenizer { debug };
+    let parser = TokenParser { debug };
     let gs: HashMap<String, Reference> = HashMap::new();
     let mut evaluator = Evaluator {
         global_scope: gs,

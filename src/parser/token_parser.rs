@@ -2,7 +2,7 @@ use crate::token::token_type::TokenTypes;
 use crate::token::tokenizer::Token;
 
 pub struct TokenParser {
-    pub debug: bool
+    pub debug: bool,
 }
 
 impl TokenParser {

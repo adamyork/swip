@@ -394,17 +394,16 @@ impl Evaluator {
                 //left assignment of concatenated value
                 let mut value = false;
                 if let Operator::BOOLEANAND(pattern) = operator {
-                    let references: Vec<bool> = Referencer::get_all(right_identifier_token, &pattern, scope);
+                    let references: Vec<bool> =
+                        Referencer::get_all(right_identifier_token, &pattern, scope);
                     value = references.into_iter().reduce(|a, b| a && b).unwrap();
                 }
                 if let Operator::BOOLEANOR(pattern) = operator {
-                    let references: Vec<bool> = Referencer::get_all(right_identifier_token, &pattern, scope);
+                    let references: Vec<bool> =
+                        Referencer::get_all(right_identifier_token, &pattern, scope);
                     value = references.into_iter().reduce(|a, b| a || b).unwrap();
                 }
-                scope.insert(
-                    token.value.clone(),
-                    Reference::Boolean(value.clone(), true),
-                );
+                scope.insert(token.value.clone(), Reference::Boolean(value.clone(), true));
             } else {
                 //left assignment of raw value
                 let bool_val = right_identifier_token.value.parse().unwrap();

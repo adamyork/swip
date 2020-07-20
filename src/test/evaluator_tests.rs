@@ -7,16 +7,15 @@ use crate::token::tokenizer::Tokenizer;
 
 #[test]
 fn test_single_mutable_number_no_value() {
-    let tokenizer = Tokenizer {
-        debug: false
-    };
-    let parser = TokenParser {
-        debug: false
-    };
+    let tokenizer = Tokenizer { debug: false };
+    let parser = TokenParser { debug: false };
     let mut tokens: Vec<Token> = tokenizer.tokenize("**$ number1");
     let mut tree: Vec<Vec<Token>> = parser.parse(&mut tokens);
     let gs: HashMap<String, Reference> = HashMap::new();
-    let mut evaluator = Evaluator { global_scope: gs, debug: false };
+    let mut evaluator = Evaluator {
+        global_scope: gs,
+        debug: false,
+    };
     evaluator.evaluate(&mut tree);
     let value = evaluator.get_scope().get("number1").unwrap();
     if let Reference::Number(number_val, number_mutable) = value {
@@ -28,16 +27,15 @@ fn test_single_mutable_number_no_value() {
 }
 
 fn test_single_mutable_number() {
-    let tokenizer = Tokenizer {
-        debug: false
-    };
-    let parser = TokenParser {
-        debug: false
-    };
+    let tokenizer = Tokenizer { debug: false };
+    let parser = TokenParser { debug: false };
     let mut tokens: Vec<Token> = tokenizer.tokenize("**$ number1 32");
     let mut tree: Vec<Vec<Token>> = parser.parse(&mut tokens);
     let gs: HashMap<String, Reference> = HashMap::new();
-    let mut evaluator = Evaluator { global_scope: gs, debug: false };
+    let mut evaluator = Evaluator {
+        global_scope: gs,
+        debug: false,
+    };
     evaluator.evaluate(&mut tree);
     let value = evaluator.get_scope().get("number1").unwrap();
     if let Reference::Number(number_val, number_mutable) = value {
@@ -49,16 +47,15 @@ fn test_single_mutable_number() {
 }
 
 fn test_single_immutable_number() {
-    let tokenizer = Tokenizer {
-        debug: false
-    };
-    let parser = TokenParser {
-        debug: false
-    };
+    let tokenizer = Tokenizer { debug: false };
+    let parser = TokenParser { debug: false };
     let mut tokens: Vec<Token> = tokenizer.tokenize("*$ number1 32");
     let mut tree: Vec<Vec<Token>> = parser.parse(&mut tokens);
     let gs: HashMap<String, Reference> = HashMap::new();
-    let mut evaluator = Evaluator { global_scope: gs, debug: false };
+    let mut evaluator = Evaluator {
+        global_scope: gs,
+        debug: false,
+    };
     evaluator.evaluate(&mut tree);
     let value = evaluator.get_scope().get("number1").unwrap();
     if let Reference::Number(number_val, number_mutable) = value {
@@ -70,16 +67,15 @@ fn test_single_immutable_number() {
 }
 
 fn test_multi_mixed_number() {
-    let tokenizer = Tokenizer {
-        debug: false
-    };
-    let parser = TokenParser {
-        debug: false
-    };
+    let tokenizer = Tokenizer { debug: false };
+    let parser = TokenParser { debug: false };
     let mut tokens: Vec<Token> = tokenizer.tokenize("*$ number1 32\n**$ number 2");
     let mut tree: Vec<Vec<Token>> = parser.parse(&mut tokens);
     let gs: HashMap<String, Reference> = HashMap::new();
-    let mut evaluator = Evaluator { global_scope: gs, debug: false };
+    let mut evaluator = Evaluator {
+        global_scope: gs,
+        debug: false,
+    };
     evaluator.evaluate(&mut tree);
     let value1 = evaluator.get_scope().get("number1").unwrap().clone();
     if let Reference::Number(number_val, number_mutable) = value1 {
@@ -99,16 +95,15 @@ fn test_multi_mixed_number() {
 
 #[test]
 fn test_single_mutable_string_no_value() {
-    let tokenizer = Tokenizer {
-        debug: false
-    };
-    let parser = TokenParser {
-        debug: false
-    };
+    let tokenizer = Tokenizer { debug: false };
+    let parser = TokenParser { debug: false };
     let mut tokens: Vec<Token> = tokenizer.tokenize("**\" string1");
     let mut tree: Vec<Vec<Token>> = parser.parse(&mut tokens);
     let gs: HashMap<String, Reference> = HashMap::new();
-    let mut evaluator = Evaluator { global_scope: gs, debug: false };
+    let mut evaluator = Evaluator {
+        global_scope: gs,
+        debug: false,
+    };
     evaluator.evaluate(&mut tree);
     let value = evaluator.get_scope().get("string1").unwrap();
     if let Reference::String(str_val, str_mutable) = value {
@@ -126,7 +121,10 @@ fn test_single_mutable_string() {
     let mut tokens: Vec<Token> = tokenizer.tokenize("**\" string1 \"hello\"");
     let mut tree: Vec<Vec<Token>> = parser.parse(&mut tokens);
     let gs: HashMap<String, Reference> = HashMap::new();
-    let mut evaluator = Evaluator { global_scope: gs, debug: false };
+    let mut evaluator = Evaluator {
+        global_scope: gs,
+        debug: false,
+    };
     evaluator.evaluate(&mut tree);
     let value = evaluator.get_scope().get("string1").unwrap();
     if let Reference::String(string_val, string_mutable) = value {
@@ -139,16 +137,15 @@ fn test_single_mutable_string() {
 
 #[test]
 fn test_single_immutable_string() {
-    let tokenizer = Tokenizer {
-        debug: false
-    };
-    let parser = TokenParser {
-        debug: false
-    };
+    let tokenizer = Tokenizer { debug: false };
+    let parser = TokenParser { debug: false };
     let mut tokens: Vec<Token> = tokenizer.tokenize("*\" string1 \"hello\"");
     let mut tree: Vec<Vec<Token>> = parser.parse(&mut tokens);
     let gs: HashMap<String, Reference> = HashMap::new();
-    let mut evaluator = Evaluator { global_scope: gs, debug: false };
+    let mut evaluator = Evaluator {
+        global_scope: gs,
+        debug: false,
+    };
     evaluator.evaluate(&mut tree);
     let value = evaluator.get_scope().get("string1").unwrap();
     if let Reference::String(string_val, string_mutable) = value {
@@ -161,17 +158,16 @@ fn test_single_immutable_string() {
 
 #[test]
 fn test_multi_mixed_string() {
-    let tokenizer = Tokenizer {
-        debug: false
-    };
-    let parser = TokenParser {
-        debug: false
-    };
+    let tokenizer = Tokenizer { debug: false };
+    let parser = TokenParser { debug: false };
     let mut tokens: Vec<Token> =
         tokenizer.tokenize("*\" string1 \"hello\"\n**\" string2 \"world\"");
     let mut tree: Vec<Vec<Token>> = parser.parse(&mut tokens);
     let gs: HashMap<String, Reference> = HashMap::new();
-    let mut evaluator = Evaluator { global_scope: gs, debug: false };
+    let mut evaluator = Evaluator {
+        global_scope: gs,
+        debug: false,
+    };
     evaluator.evaluate(&mut tree);
     let value1 = evaluator.get_scope().get("string1").unwrap().clone();
     if let Reference::String(string_val, string_mutable) = value1 {
@@ -191,16 +187,15 @@ fn test_multi_mixed_string() {
 
 #[test]
 fn test_update_string_with_raw() {
-    let tokenizer = Tokenizer {
-        debug: false
-    };
-    let parser = TokenParser {
-        debug: false
-    };
+    let tokenizer = Tokenizer { debug: false };
+    let parser = TokenParser { debug: false };
     let mut tokens: Vec<Token> = tokenizer.tokenize("**\" string1 \"hello\"\nstring1 \"world\"");
     let mut tree: Vec<Vec<Token>> = parser.parse(&mut tokens);
     let gs: HashMap<String, Reference> = HashMap::new();
-    let mut evaluator = Evaluator { global_scope: gs, debug: false };
+    let mut evaluator = Evaluator {
+        global_scope: gs,
+        debug: false,
+    };
     evaluator.evaluate(&mut tree);
     let value1 = evaluator.get_scope().get("string1").unwrap().clone();
     if let Reference::String(string_val, string_mutable) = value1 {
@@ -213,17 +208,16 @@ fn test_update_string_with_raw() {
 
 #[test]
 fn test_update_string_with_var() {
-    let tokenizer = Tokenizer {
-        debug: false
-    };
-    let parser = TokenParser {
-        debug: false
-    };
+    let tokenizer = Tokenizer { debug: false };
+    let parser = TokenParser { debug: false };
     let mut tokens: Vec<Token> =
         tokenizer.tokenize("**\" string1 \"hello\"\n**\" string2 \"world\"\nstring1 string2");
     let mut tree: Vec<Vec<Token>> = parser.parse(&mut tokens);
     let gs: HashMap<String, Reference> = HashMap::new();
-    let mut evaluator = Evaluator { global_scope: gs, debug: false };
+    let mut evaluator = Evaluator {
+        global_scope: gs,
+        debug: false,
+    };
     evaluator.evaluate(&mut tree);
     let value1 = evaluator.get_scope().get("string1").unwrap().clone();
     if let Reference::String(string_val, string_mutable) = value1 {
@@ -236,17 +230,16 @@ fn test_update_string_with_var() {
 
 #[test]
 fn test_update_string_with_concat() {
-    let tokenizer = Tokenizer {
-        debug: false
-    };
-    let parser = TokenParser {
-        debug: false
-    };
+    let tokenizer = Tokenizer { debug: false };
+    let parser = TokenParser { debug: false };
     let mut tokens: Vec<Token> = tokenizer
         .tokenize("**\" string1 \"hello\"\n**\" string2 \"world\"\nstring1 string1.string2");
     let mut tree: Vec<Vec<Token>> = parser.parse(&mut tokens);
     let gs: HashMap<String, Reference> = HashMap::new();
-    let mut evaluator = Evaluator { global_scope: gs, debug: false };
+    let mut evaluator = Evaluator {
+        global_scope: gs,
+        debug: false,
+    };
     evaluator.evaluate(&mut tree);
     let value1 = evaluator.get_scope().get("string1").unwrap().clone();
     if let Reference::String(string_val, string_mutable) = value1 {
@@ -259,16 +252,15 @@ fn test_update_string_with_concat() {
 
 #[test]
 fn test_single_mutable_boolean_no_value() {
-    let tokenizer = Tokenizer {
-        debug: false
-    };
-    let parser = TokenParser {
-        debug: false
-    };
+    let tokenizer = Tokenizer { debug: false };
+    let parser = TokenParser { debug: false };
     let mut tokens: Vec<Token> = tokenizer.tokenize("**b boolean1");
     let mut tree: Vec<Vec<Token>> = parser.parse(&mut tokens);
     let gs: HashMap<String, Reference> = HashMap::new();
-    let mut evaluator = Evaluator { global_scope: gs, debug: false };
+    let mut evaluator = Evaluator {
+        global_scope: gs,
+        debug: false,
+    };
     evaluator.evaluate(&mut tree);
     let value = evaluator.get_scope().get("boolean1").unwrap();
     if let Reference::Boolean(bool_val, bool_mutable) = value {
@@ -281,16 +273,15 @@ fn test_single_mutable_boolean_no_value() {
 
 #[test]
 fn test_single_mutable_boolean() {
-    let tokenizer = Tokenizer {
-        debug: false
-    };
-    let parser = TokenParser {
-        debug: false
-    };
+    let tokenizer = Tokenizer { debug: false };
+    let parser = TokenParser { debug: false };
     let mut tokens: Vec<Token> = tokenizer.tokenize("**b boolean1 true");
     let mut tree: Vec<Vec<Token>> = parser.parse(&mut tokens);
     let gs: HashMap<String, Reference> = HashMap::new();
-    let mut evaluator = Evaluator { global_scope: gs, debug: false };
+    let mut evaluator = Evaluator {
+        global_scope: gs,
+        debug: false,
+    };
     evaluator.evaluate(&mut tree);
     let value = evaluator.get_scope().get("boolean1").unwrap();
     if let Reference::Boolean(bool_val, bool_mutable) = value {
@@ -303,16 +294,15 @@ fn test_single_mutable_boolean() {
 
 #[test]
 fn test_single_immutable_boolean() {
-    let tokenizer = Tokenizer {
-        debug: false
-    };
-    let parser = TokenParser {
-        debug: false
-    };
+    let tokenizer = Tokenizer { debug: false };
+    let parser = TokenParser { debug: false };
     let mut tokens: Vec<Token> = tokenizer.tokenize("*b boolean1 true");
     let mut tree: Vec<Vec<Token>> = parser.parse(&mut tokens);
     let gs: HashMap<String, Reference> = HashMap::new();
-    let mut evaluator = Evaluator { global_scope: gs, debug: false };
+    let mut evaluator = Evaluator {
+        global_scope: gs,
+        debug: false,
+    };
     evaluator.evaluate(&mut tree);
     let value = evaluator.get_scope().get("boolean1").unwrap();
     if let Reference::Boolean(bool_val, bool_mutable) = value {
@@ -326,32 +316,30 @@ fn test_single_immutable_boolean() {
 #[test]
 #[should_panic]
 fn test_immutable_cant_update() {
-    let tokenizer = Tokenizer {
-        debug: false
-    };
-    let parser = TokenParser {
-        debug: false
-    };
+    let tokenizer = Tokenizer { debug: false };
+    let parser = TokenParser { debug: false };
     let mut tokens: Vec<Token> = tokenizer
         .tokenize("*\" string1 \"hello\"\n**\" string2 \"world\"\nstring1 string1.string2");
     let mut tree: Vec<Vec<Token>> = parser.parse(&mut tokens);
     let gs: HashMap<String, Reference> = HashMap::new();
-    let mut evaluator = Evaluator { global_scope: gs, debug: false };
+    let mut evaluator = Evaluator {
+        global_scope: gs,
+        debug: false,
+    };
     evaluator.evaluate(&mut tree);
 }
 
 #[test]
 fn test_print_var() {
-    let tokenizer = Tokenizer {
-        debug: false
-    };
-    let parser = TokenParser {
-        debug: false
-    };
+    let tokenizer = Tokenizer { debug: false };
+    let parser = TokenParser { debug: false };
     let mut tokens: Vec<Token> = tokenizer.tokenize("**b someBool true\n# someBool");
     let mut tree: Vec<Vec<Token>> = parser.parse(&mut tokens);
     let gs: HashMap<String, Reference> = HashMap::new();
-    let mut evaluator = Evaluator { global_scope: gs, debug: false };
+    let mut evaluator = Evaluator {
+        global_scope: gs,
+        debug: false,
+    };
     evaluator.evaluate(&mut tree);
 }
 
@@ -359,11 +347,14 @@ fn test_print_var() {
 fn test_update_boolean_with_and() {
     let tokenizer = Tokenizer { debug: false };
     let parser = TokenParser { debug: false };
-    let mut tokens: Vec<Token> = tokenizer
-        .tokenize("**b boolean1 true\n**b boolean2 false\nboolean1 boolean1.boolean2");
+    let mut tokens: Vec<Token> =
+        tokenizer.tokenize("**b boolean1 true\n**b boolean2 false\nboolean1 boolean1.boolean2");
     let mut tree: Vec<Vec<Token>> = parser.parse(&mut tokens);
     let gs: HashMap<String, Reference> = HashMap::new();
-    let mut evaluator = Evaluator { global_scope: gs, debug: false };
+    let mut evaluator = Evaluator {
+        global_scope: gs,
+        debug: false,
+    };
     evaluator.evaluate(&mut tree);
     let value1 = evaluator.get_scope().get("boolean1").unwrap().clone();
     if let Reference::Boolean(bool_val, bool_mutable) = value1 {
@@ -378,11 +369,14 @@ fn test_update_boolean_with_and() {
 fn test_update_boolean_with_or() {
     let tokenizer = Tokenizer { debug: false };
     let parser = TokenParser { debug: false };
-    let mut tokens: Vec<Token> = tokenizer
-        .tokenize("**b boolean1 true\n**b boolean2 false\nboolean1 boolean1\\boolean2");
+    let mut tokens: Vec<Token> =
+        tokenizer.tokenize("**b boolean1 true\n**b boolean2 false\nboolean1 boolean1\\boolean2");
     let mut tree: Vec<Vec<Token>> = parser.parse(&mut tokens);
     let gs: HashMap<String, Reference> = HashMap::new();
-    let mut evaluator = Evaluator { global_scope: gs, debug: false };
+    let mut evaluator = Evaluator {
+        global_scope: gs,
+        debug: false,
+    };
     evaluator.evaluate(&mut tree);
     let value1 = evaluator.get_scope().get("boolean1").unwrap().clone();
     if let Reference::Boolean(bool_val, bool_mutable) = value1 {
