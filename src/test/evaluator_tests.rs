@@ -386,3 +386,70 @@ fn test_update_boolean_with_or() {
         panic!("Reference is not a boolean.")
     }
 }
+
+#[test]
+fn test_update_mutable_number_with_raw() {
+    let tokenizer = Tokenizer { debug: false };
+    let parser = TokenParser { debug: false };
+    let mut tokens: Vec<Token> =
+        tokenizer.tokenize("**$ number1 32\nnumber1 100");
+    let mut tree: Vec<Vec<Token>> = parser.parse(&mut tokens);
+    let gs: HashMap<String, Reference> = HashMap::new();
+    let mut evaluator = Evaluator {
+        global_scope: gs,
+        debug: false,
+    };
+    evaluator.evaluate(&mut tree);
+    let value1 = evaluator.get_scope().get("number1").unwrap().clone();
+    if let Reference::Number(num_val, num_mutable) = value1 {
+        assert_eq!(num_val, &100);
+        assert_eq!(num_mutable, &true);
+    } else {
+        panic!("Reference is not a number.")
+    }
+}
+
+#[test]
+fn test_update_mutable_number_with_var() {
+    let tokenizer = Tokenizer { debug: false };
+    let parser = TokenParser { debug: false };
+    let mut tokens: Vec<Token> =
+        tokenizer.tokenize("**$ number1 32\n**$ number2 45\nnumber1 number2");
+    let mut tree: Vec<Vec<Token>> = parser.parse(&mut tokens);
+    let gs: HashMap<String, Reference> = HashMap::new();
+    let mut evaluator = Evaluator {
+        global_scope: gs,
+        debug: false,
+    };
+    evaluator.evaluate(&mut tree);
+    let value1 = evaluator.get_scope().get("number1").unwrap().clone();
+    if let Reference::Number(num_val, num_mutable) = value1 {
+        assert_eq!(num_val, &45);
+        assert_eq!(num_mutable, &true);
+    } else {
+        panic!("Reference is not a number.")
+    }
+}
+
+#[test]
+fn test_update_mutable_number_with_sum() {
+    let tokenizer = Tokenizer { debug: false };
+    let parser = TokenParser { debug: false };
+    let mut tokens: Vec<Token> =
+        tokenizer.tokenize("**$ number1 32\n**$ number2 45\nnumber1 number1.number2");
+    let mut tree: Vec<Vec<Token>> = parser.parse(&mut tokens);
+    let gs: HashMap<String, Reference> = HashMap::new();
+    let mut evaluator = Evaluator {
+        global_scope: gs,
+        debug: false,
+    };
+    evaluator.evaluate(&mut tree);
+    let value1 = evaluator.get_scope().get("number1").unwrap().clone();
+    if let Reference::Number(num_val, num_mutable) = value1 {
+        assert_eq!(num_val, &77);
+        assert_eq!(num_mutable, &true);
+    } else {
+        panic!("Reference is not a number.")
+    }
+}
+

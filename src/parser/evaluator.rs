@@ -372,7 +372,40 @@ impl Evaluator {
         token: &Token,
         tree: &mut Vec<Vec<Token>>,
         scope: &mut HashMap<String, Reference>,
-    ) {}
+    ) {
+        let right_branch = tree.remove(0);
+        let right_identifier_token = right_branch.get(0).unwrap();
+        let maybe_right_value = scope.get(right_identifier_token.value.clone().as_str());
+        if maybe_right_value.is_some() {
+            //left assignment of right variable previously declared
+            let right_reference = maybe_right_value.unwrap();
+            if let Reference::Number(right_value, _right_mutable) = right_reference {
+                let right_clone = right_value.clone();
+                scope.insert(token.value.clone(), Reference::Number(right_clone, true));
+            }
+        } else {
+            let operator = Self::get_numeric_operator(right_identifier_token);
+            if Self::all_names_in_scope(right_identifier_token, scope, operator) {
+                //left assignment of concatenated value
+                let new_value = Self::apply_numeric_operation(right_identifier_token, scope, &operator);
+                scope.insert(
+                    token.value.clone(),
+                    Reference::Number(new_value.clone(), true),
+                );
+            } else {
+                let new_value: i32;
+                if let Operator::UNSUPPORTED(_some_val) = operator {
+                    new_value = right_identifier_token.value.parse().unwrap();
+                } else {
+                    new_value = Self::apply_numeric_operation(right_identifier_token, scope, &operator);
+                }
+                scope.insert(
+                    token.value.clone(),
+                    Reference::Number(new_value.clone(), true),
+                );
+            }
+        }
+    }
     pub fn update_boolean_reference(
         token: &Token,
         tree: &mut Vec<Vec<Token>>,
@@ -481,8 +514,6 @@ impl GetAll<bool> for Referencer {
             .collect();
     }
 }
-
-// }
 
 // function updateNumberReference(instance, branch, tree, scope) {
 //     console.log('tree ', tree);
